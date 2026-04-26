@@ -368,7 +368,6 @@ h2 {
   opacity: 0.08;
   filter: blur(10px);
   animation: reveal-reading-char 0.65s ease-out forwards;
-  animation-delay: var(--char-delay);
 }
 
 .reading-char-space {
