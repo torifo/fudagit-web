@@ -361,19 +361,28 @@ h2 {
   font-size: clamp(1.55rem, 2.2vw, 2rem);
   line-height: 1.95;
   letter-spacing: 0.08em;
-  opacity: 0.18;
-  filter: blur(10px);
-  animation: reveal-reading 3.4s ease-out forwards;
 }
 
-@keyframes reveal-reading {
+.reading-char {
+  display: inline-block;
+  opacity: 0.08;
+  filter: blur(10px);
+  animation: reveal-reading-char 0.65s ease-out forwards;
+  animation-delay: var(--char-delay);
+}
+
+.reading-char-space {
+  min-inline-size: 0.7em;
+}
+
+@keyframes reveal-reading-char {
   0% {
-    opacity: 0.18;
+    opacity: 0.08;
     filter: blur(10px);
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
 
-  55% {
+  60% {
     opacity: 0.55;
     filter: blur(5px);
   }
@@ -614,6 +623,12 @@ h2 {
   }
 
   .reading-text {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+
+  .reading-char {
     opacity: 1;
     filter: blur(0);
     transform: none;

@@ -78,6 +78,13 @@ const accuracy = (correctCount: number, total: number) => {
   return Math.round((correctCount / total) * 100);
 };
 
+const splitReadingText = (text: string) =>
+  Array.from(text).map((character, index) => ({
+    character,
+    index,
+    isSpace: character === ' ',
+  }));
+
 export default function App() {
   const [screen, setScreen] = createSignal<Screen>('start');
   const [difficulty, setDifficulty] = createSignal<Difficulty>('normal');
@@ -105,7 +112,9 @@ export default function App() {
       return null;
     }
 
-    return current.options.find((option) => option.id === currentSelection) ?? null;
+    return (
+      current.options.find((option) => option.id === currentSelection) ?? null
+    );
   });
   const canUseQuestionCount = createMemo(() =>
     questionCountOptions.filter((count) => count <= cards.length),
@@ -258,13 +267,37 @@ export default function App() {
                   <article class="reading-card">
                     <p class="reading-label">読み札</p>
                     <div class="reading-frame">
-                      <p class="reading-text">{question.prompt.description}</p>
+                      <p
+                        class="reading-text"
+                        aria-label={question.prompt.description}
+                      >
+                        <For
+                          each={splitReadingText(question.prompt.description)}
+                        >
+                          {(item) => (
+                            <span
+                              classList={{
+                                'reading-char': true,
+                                'reading-char-space': item.isSpace,
+                              }}
+                              style={{
+                                '--char-delay': `${item.index * 0.08}s`,
+                              }}
+                              aria-hidden="true"
+                            >
+                              {item.character}
+                            </span>
+                          )}
+                        </For>
+                      </p>
                     </div>
                   </article>
 
                   <section class="answer-column">
                     <div class="play-note">
-                      <p>説明文が浮かび上がる途中でも、思い切って札を取れます。</p>
+                      <p>
+                        説明文が浮かび上がる途中でも、思い切って札を取れます。
+                      </p>
                     </div>
                     <div class="card-grid" data-difficulty={difficulty()}>
                       <For each={question.options}>
@@ -277,19 +310,19 @@ export default function App() {
                           return (
                             <button
                               type="button"
-                            classList={{
-                              'command-card': true,
-                              selected: isSelected(),
-                              correct: isAnswered() && isCorrect(),
-                              wrong:
-                                isAnswered() && isSelected() && !isCorrect(),
-                            }}
-                            onClick={() => handleAnswer(option.id)}
-                            disabled={isAnswered()}
-                            aria-pressed={isSelected()}
-                          >
-                            <span class="command-card-label">取り札</span>
-                            <strong>{option.command}</strong>
+                              classList={{
+                                'command-card': true,
+                                selected: isSelected(),
+                                correct: isAnswered() && isCorrect(),
+                                wrong:
+                                  isAnswered() && isSelected() && !isCorrect(),
+                              }}
+                              onClick={() => handleAnswer(option.id)}
+                              disabled={isAnswered()}
+                              aria-pressed={isSelected()}
+                            >
+                              <span class="command-card-label">取り札</span>
+                              <strong>{option.command}</strong>
                             </button>
                           );
                         }}

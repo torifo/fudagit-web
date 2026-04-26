@@ -57,11 +57,11 @@ npm run format:check
 
 ## Difficulty
 
-| Difficulty | Cards | Notes |
-| --- | ---: | --- |
-| `easy` | 4 | 札数を絞って遊びやすくしたモード |
-| `normal` | 6 | 標準モード |
-| `hard` | 8 | 見切りと一覧性の両方が問われるモード |
+| Difficulty | Cards | Notes                                |
+| ---------- | ----: | ------------------------------------ |
+| `easy`     |     4 | 札数を絞って遊びやすくしたモード     |
+| `normal`   |     6 | 標準モード                           |
+| `hard`     |     8 | 見切りと一覧性の両方が問われるモード |
 
 ## Project Structure
 
