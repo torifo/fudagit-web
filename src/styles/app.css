@@ -318,7 +318,8 @@ h2 {
 
 .reading-frame {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: flex-start;
   min-height: min(72vh, 760px);
   padding: 26px 18px;
   border-radius: 18px;
@@ -342,8 +343,8 @@ h2 {
 
 .reading-text {
   margin: 0;
-  inline-size: max-content;
-  min-inline-size: 100%;
+  inline-size: 100%;
+  max-inline-size: 100%;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   font-family: var(--font-display);
