@@ -326,7 +326,8 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: min(72vh, 760px);
+  block-size: min(760px, calc(100vh - 230px));
+  min-block-size: 360px;
   padding: 26px 18px;
   border-radius: 18px;
   background:
@@ -566,7 +567,8 @@ h2 {
   }
 
   .reading-frame {
-    min-height: min(58vh, 520px);
+    block-size: min(520px, calc(100vh - 220px));
+    min-block-size: 320px;
   }
 
   .reading-text {
@@ -604,7 +606,8 @@ h2 {
   }
 
   .reading-frame {
-    min-height: min(50vh, 420px);
+    block-size: min(420px, calc(100vh - 210px));
+    min-block-size: 260px;
     padding-inline: 14px;
   }
 

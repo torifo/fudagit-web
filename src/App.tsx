@@ -206,8 +206,8 @@ export default function App() {
           <section class="screen screen-start">
             <div class="hero-copy">
               <p class="eyebrow">Git Command Karuta</p>
-              <h1>読んで、見切れ。</h1>
-              <p class="lede">Git コマンドの説明文が、静かに浮かび上がる。</p>
+              <h1>詠みを追って、見切れ。</h1>
+              <p class="lede">Git コマンドの詠み札が、静かに浮かび上がる。</p>
             </div>
 
             <div class="panel">
