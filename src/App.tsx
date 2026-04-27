@@ -173,15 +173,10 @@ export default function App() {
           <section class="screen screen-start">
             <div class="hero-copy">
               <p class="eyebrow">Git Command Karuta</p>
-              <h1>札を取るたび、Git が手に馴染む。</h1>
+              <h1>読んで、見切れ。</h1>
               <p class="lede">
-                説明文が静かに浮かび上がるあいだに、最もふさわしいコマンド札を見切る。
+                Git コマンドの説明文が、静かに浮かび上がる。
               </p>
-              <div class="hero-notes" aria-label="遊び方の要点">
-                <p>文章がすべて見える前でも札を取れます。</p>
-                <p>回答は 1 問につき 1 回のみです。</p>
-                <p>回答後は正解と解説を確認して次へ進みます。</p>
-              </div>
             </div>
 
             <div class="panel">
@@ -294,11 +289,6 @@ export default function App() {
                   </article>
 
                   <section class="answer-column">
-                    <div class="play-note">
-                      <p>
-                        説明文が浮かび上がる途中でも、思い切って札を取れます。
-                      </p>
-                    </div>
                     <div class="card-grid" data-difficulty={difficulty()}>
                       <For each={question.options}>
                         {(option) => {
@@ -344,12 +334,12 @@ export default function App() {
                           <Show when={selectedCard()}>
                             {(selected) => (
                               <p class="result-command">
-                                あなたの札: <code>{selected().command}</code>
+                                選んだコマンド: <code>{selected().command}</code>
                               </p>
                             )}
                           </Show>
                           <p class="result-command">
-                            正しい札: <code>{question.prompt.command}</code>
+                            正解: <code>{question.prompt.command}</code>
                           </p>
                           <p class="result-explanation">
                             {question.prompt.explanation}
@@ -390,7 +380,7 @@ export default function App() {
                   <strong>{questionCount()}</strong>
                 </div>
                 <div>
-                  <span>見切れた札</span>
+                  <span>正解</span>
                   <strong>{correctCount()}</strong>
                 </div>
                 <div>
