@@ -246,6 +246,16 @@ export default function App() {
   const formattedElapsedTime = createMemo(() =>
     formatElapsedTime(totalElapsedMs()),
   );
+  const remainingTimeRatio = createMemo(() => {
+    const timeLimit = currentTimeLimit();
+    const timeLeft = remainingTime();
+
+    if (timeLimit === null || timeLeft === null) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(1, timeLeft / timeLimit));
+  });
 
   const captureRoundElapsed = () => {
     const startedAt = roundStartedAt();
@@ -522,6 +532,19 @@ export default function App() {
                         ? 'なし'
                         : `${remainingTime()}秒`}
                     </strong>
+                    <Show when={remainingTime() !== null}>
+                      <div class="timer-bar" aria-hidden="true">
+                        <div
+                          classList={{
+                            'timer-bar-fill': true,
+                            warning: remainingTimeRatio() <= 0.34,
+                          }}
+                          style={{
+                            width: `${remainingTimeRatio() * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </Show>
                   </div>
                   <div class="status-item status-item-audio">
                     <span class="status-label">読み上げ</span>

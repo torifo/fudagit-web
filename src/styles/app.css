@@ -337,6 +337,27 @@ h2 {
   font-size: 0.85rem;
 }
 
+.timer-bar {
+  overflow: hidden;
+  inline-size: 100%;
+  block-size: 7px;
+  border-radius: 999px;
+  background: rgba(63, 111, 79, 0.14);
+}
+
+.timer-bar-fill {
+  block-size: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #79a05c);
+  transition:
+    width 220ms linear,
+    background-color 220ms ease;
+}
+
+.timer-bar-fill.warning {
+  background: linear-gradient(90deg, #b96b34, var(--danger));
+}
+
 .play-layout {
   display: grid;
   grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
