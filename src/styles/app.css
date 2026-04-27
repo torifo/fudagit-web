@@ -605,12 +605,6 @@ h2 {
     scroll-behavior: auto !important;
   }
 
-  .reading-text {
-    opacity: 1;
-    filter: blur(0);
-    transform: none;
-  }
-
   .reading-char {
     opacity: 1;
     filter: blur(0);

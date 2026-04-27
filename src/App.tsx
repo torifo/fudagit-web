@@ -339,7 +339,7 @@ export default function App() {
                             )}
                           </Show>
                           <p class="result-command">
-                            正解: <code>{question.prompt.command}</code>
+                            正解コマンド: <code>{question.prompt.command}</code>
                           </p>
                           <p class="result-explanation">
                             {question.prompt.explanation}
