@@ -78,12 +78,45 @@ const accuracy = (correctCount: number, total: number) => {
   return Math.round((correctCount / total) * 100);
 };
 
-const splitReadingText = (text: string) =>
-  Array.from(text).map((character, index) => ({
-    character,
-    index,
-    isSpace: character === ' ',
-  }));
+type ReadingToken = {
+  value: string;
+  index: number;
+  kind: 'char' | 'space' | 'word';
+};
+
+const splitReadingText = (text: string) => {
+  const tokens: ReadingToken[] = [];
+  const asciiWordPattern = /[A-Za-z0-9][A-Za-z0-9._/-]*/y;
+  let cursor = 0;
+  let index = 0;
+
+  while (cursor < text.length) {
+    asciiWordPattern.lastIndex = cursor;
+    const wordMatch = asciiWordPattern.exec(text);
+
+    if (wordMatch) {
+      tokens.push({
+        value: wordMatch[0],
+        index,
+        kind: 'word',
+      });
+      cursor += wordMatch[0].length;
+      index += 1;
+      continue;
+    }
+
+    const character = text[cursor];
+    tokens.push({
+      value: character,
+      index,
+      kind: character === ' ' ? 'space' : 'char',
+    });
+    cursor += 1;
+    index += 1;
+  }
+
+  return tokens;
+};
 
 export default function App() {
   const [screen, setScreen] = createSignal<Screen>('start');
@@ -271,14 +304,15 @@ export default function App() {
                             <span
                               classList={{
                                 'reading-char': true,
-                                'reading-char-space': item.isSpace,
+                                'reading-char-space': item.kind === 'space',
+                                'reading-char-word': item.kind === 'word',
                               }}
                               style={{
                                 'animation-delay': `${item.index * 0.1}s`,
                               }}
                               aria-hidden="true"
                             >
-                              {item.character}
+                              {item.value}
                             </span>
                           )}
                         </For>

@@ -370,6 +370,11 @@ h2 {
   min-inline-size: 0.7em;
 }
 
+.reading-char-word {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
 @keyframes reveal-reading-char {
   0% {
     opacity: 0;
