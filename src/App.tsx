@@ -281,7 +281,7 @@ export default function App() {
                                 'reading-char-space': item.isSpace,
                               }}
                               style={{
-                                'animation-delay': `${item.index * 0.08}s`,
+                                'animation-delay': `${item.index * 0.1}s`,
                               }}
                               aria-hidden="true"
                             >
