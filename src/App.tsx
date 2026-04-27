@@ -20,26 +20,35 @@ type GameQuestion = {
 type RoundResult = {
   selectedId: string;
   correct: boolean;
+  outcome: 'answer' | 'timeout';
 };
 
 const difficultyConfig: Record<
   Difficulty,
-  { label: string; optionCount: number; description: string }
+  {
+    label: string;
+    optionCount: number;
+    description: string;
+    timeLimitSeconds: number | null;
+  }
 > = {
   easy: {
     label: 'Easy',
     optionCount: 4,
     description: 'まずは少ない札から、読み札の感覚を掴む。',
+    timeLimitSeconds: null,
   },
   normal: {
     label: 'Normal',
     optionCount: 6,
     description: '日常的に Git を使う人向けの標準戦。',
+    timeLimitSeconds: 12,
   },
   hard: {
     label: 'Hard',
     optionCount: 8,
     description: '札数が増え、見切りの速さも試される。',
+    timeLimitSeconds: 8,
   },
 };
 
@@ -189,7 +198,8 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = createSignal(0);
   const [results, setResults] = createSignal<RoundResult[]>([]);
   const [selectedId, setSelectedId] = createSignal<string | null>(null);
-  const [voiceEnabled, setVoiceEnabled] = createSignal(tts.isSupported());
+  const [voiceEnabled, setVoiceEnabled] = createSignal(false);
+  const [remainingTime, setRemainingTime] = createSignal<number | null>(null);
 
   const currentQuestion = createMemo(() => questions()[currentIndex()]);
   const totalQuestions = createMemo(() => questions().length);
@@ -215,6 +225,9 @@ export default function App() {
   });
   const canUseQuestionCount = createMemo(() =>
     questionCountOptions.filter((count) => count <= cards.length),
+  );
+  const currentTimeLimit = createMemo(
+    () => difficultyConfig[difficulty()].timeLimitSeconds,
   );
 
   const startGame = () => {
@@ -243,7 +256,10 @@ export default function App() {
 
     tts.stop();
     setSelectedId(cardId);
-    setResults((prev) => [...prev, { selectedId: cardId, correct }]);
+    setResults((prev) => [
+      ...prev,
+      { selectedId: cardId, correct, outcome: 'answer' },
+    ]);
   };
 
   const goNext = () => {
@@ -293,6 +309,49 @@ export default function App() {
     tts.speak(question.prompt.description);
   });
 
+  createEffect(() => {
+    const question = currentQuestion();
+    const timeLimit = currentTimeLimit();
+
+    if (
+      screen() !== 'playing' ||
+      !question ||
+      selectedId() !== null ||
+      timeLimit === null
+    ) {
+      setRemainingTime(timeLimit);
+      return;
+    }
+
+    const deadline = Date.now() + timeLimit * 1000;
+
+    const tick = () => {
+      const secondsLeft = Math.max(
+        0,
+        Math.ceil((deadline - Date.now()) / 1000),
+      );
+      setRemainingTime(secondsLeft);
+
+      if (secondsLeft > 0) {
+        return;
+      }
+
+      tts.stop();
+      setSelectedId('__timeout__');
+      setResults((prev) => [
+        ...prev,
+        { selectedId: '__timeout__', correct: false, outcome: 'timeout' },
+      ]);
+    };
+
+    tick();
+    const timerId = window.setInterval(tick, 250);
+
+    onCleanup(() => {
+      window.clearInterval(timerId);
+    });
+  });
+
   onCleanup(() => {
     tts.stop();
   });
@@ -327,6 +386,11 @@ export default function App() {
                         <span class="choice-text">{config.description}</span>
                         <span class="choice-meta">
                           {config.optionCount} 枚勝負
+                        </span>
+                        <span class="choice-meta">
+                          {config.timeLimitSeconds === null
+                            ? '時間制限なし'
+                            : `${config.timeLimitSeconds} 秒制限`}
                         </span>
                       </button>
                     )}
@@ -405,6 +469,14 @@ export default function App() {
                   <div class="status-item">
                     <span class="status-label">難易度</span>
                     <strong>{difficultyConfig[difficulty()].label}</strong>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">制限時間</span>
+                    <strong>
+                      {remainingTime() === null
+                        ? 'なし'
+                        : `${remainingTime()}秒`}
+                    </strong>
                   </div>
                   <div class="status-item status-item-audio">
                     <span class="status-label">読み上げ</span>
@@ -496,7 +568,11 @@ export default function App() {
                               wrong: !result().correct,
                             }}
                           >
-                            {result().correct ? '正解' : '不正解'}
+                            {result().correct
+                              ? '正解'
+                              : result().outcome === 'timeout'
+                                ? '時間切れ'
+                                : '不正解'}
                           </p>
                           <Show when={selectedCard()}>
                             {(selected) => (
