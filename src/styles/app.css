@@ -106,24 +106,6 @@ code {
   max-width: 720px;
 }
 
-.hero-notes {
-  display: grid;
-  gap: 10px;
-  margin-top: 22px;
-}
-
-.hero-notes p,
-.play-note p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.hero-notes p {
-  padding-left: 16px;
-  border-left: 3px solid rgba(63, 111, 79, 0.24);
-}
-
 .eyebrow {
   margin: 0 0 10px;
   color: var(--accent);
@@ -143,6 +125,7 @@ h2 {
 h1 {
   font-size: clamp(2.5rem, 5vw, 4.6rem);
   line-height: 1.02;
+  text-wrap: balance;
 }
 
 h2 {
@@ -311,13 +294,6 @@ h2 {
 .status-label {
   color: var(--muted);
   font-size: 0.85rem;
-}
-
-.play-note {
-  padding: 14px 18px;
-  border: 1px solid rgba(63, 111, 79, 0.14);
-  border-radius: 18px;
-  background: rgba(250, 253, 247, 0.74);
 }
 
 .play-layout {
