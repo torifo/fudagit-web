@@ -12,7 +12,7 @@
 - `easy / normal / hard` の 3 難易度
 - 問題数 `5 / 10 / 20` を開始前に選択可能
 - 読み札の説明文が `blur + opacity` で徐々に出現
-- 回答後に `正誤 / 自分が選んだ札 / 正解コマンド / 解説` を表示
+- 回答後に `正誤 / 選んだコマンド / 正解コマンド / 解説` を表示
 - モバイル対応レイアウト
 - GitHub Pages への自動デプロイ
 
@@ -33,7 +33,7 @@ npm install
 npm run dev
 ```
 
-ブラウザで `http://localhost:5173` を開きます。
+ブラウザで `http://localhost:5173/fudagit-web/` を開きます。
 
 ## Available Scripts
 
@@ -90,7 +90,7 @@ npm run format:check
 
 ## Data
 
-出題データは [src/data/cards.ts](/Users/akito-shoji/dev/web/fudagit/src/data/cards.ts) にあります。  
+出題データは [src/data/cards.ts](src/data/cards.ts) にあります。  
 `description / command / explanation / tags` を持つ問題カードを収録しています。
 
 ## Deployment
@@ -145,4 +145,4 @@ agent-browser close
 
 ## Specification
 
-詳細仕様は [spec.md](/Users/akito-shoji/dev/web/fudagit/spec.md) を参照してください。
+詳細仕様は [spec.md](spec.md) を参照してください。
