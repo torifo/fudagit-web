@@ -174,9 +174,7 @@ export default function App() {
             <div class="hero-copy">
               <p class="eyebrow">Git Command Karuta</p>
               <h1>読んで、見切れ。</h1>
-              <p class="lede">
-                Git コマンドの説明文が、静かに浮かび上がる。
-              </p>
+              <p class="lede">Git コマンドの説明文が、静かに浮かび上がる。</p>
             </div>
 
             <div class="panel">
@@ -334,7 +332,8 @@ export default function App() {
                           <Show when={selectedCard()}>
                             {(selected) => (
                               <p class="result-command">
-                                選んだコマンド: <code>{selected().command}</code>
+                                選んだコマンド:{' '}
+                                <code>{selected().command}</code>
                               </p>
                             )}
                           </Show>
