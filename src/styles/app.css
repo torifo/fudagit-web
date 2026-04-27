@@ -318,7 +318,7 @@ h2 {
 
 .status-bar {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   padding: 18px 22px;
 }
@@ -558,7 +558,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-top: 24px;
 }

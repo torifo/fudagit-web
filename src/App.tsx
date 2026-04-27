@@ -96,6 +96,18 @@ const accuracy = (correctCount: number, total: number) => {
   return Math.round((correctCount / total) * 100);
 };
 
+const formatElapsedTime = (totalMs: number) => {
+  const totalSeconds = Math.max(0, Math.round(totalMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  if (minutes === 0) {
+    return `${seconds}秒`;
+  }
+
+  return `${minutes}分 ${seconds}秒`;
+};
+
 type ReadingToken = {
   value: string;
   index: number;
@@ -200,6 +212,8 @@ export default function App() {
   const [selectedId, setSelectedId] = createSignal<string | null>(null);
   const [voiceEnabled, setVoiceEnabled] = createSignal(false);
   const [remainingTime, setRemainingTime] = createSignal<number | null>(null);
+  const [roundStartedAt, setRoundStartedAt] = createSignal<number | null>(null);
+  const [totalElapsedMs, setTotalElapsedMs] = createSignal(0);
 
   const currentQuestion = createMemo(() => questions()[currentIndex()]);
   const totalQuestions = createMemo(() => questions().length);
@@ -229,6 +243,20 @@ export default function App() {
   const currentTimeLimit = createMemo(
     () => difficultyConfig[difficulty()].timeLimitSeconds,
   );
+  const formattedElapsedTime = createMemo(() =>
+    formatElapsedTime(totalElapsedMs()),
+  );
+
+  const captureRoundElapsed = () => {
+    const startedAt = roundStartedAt();
+
+    if (startedAt === null) {
+      return;
+    }
+
+    setTotalElapsedMs((prev) => prev + (Date.now() - startedAt));
+    setRoundStartedAt(null);
+  };
 
   const startGame = () => {
     const nextQuestions = buildQuestions(difficulty(), questionCount());
@@ -238,6 +266,8 @@ export default function App() {
     setResults([]);
     setCurrentIndex(0);
     setSelectedId(null);
+    setRoundStartedAt(null);
+    setTotalElapsedMs(0);
     setScreen('playing');
   };
 
@@ -255,6 +285,7 @@ export default function App() {
     const correct = prompt.id === cardId;
 
     tts.stop();
+    captureRoundElapsed();
     setSelectedId(cardId);
     setResults((prev) => [
       ...prev,
@@ -281,6 +312,8 @@ export default function App() {
     setResults([]);
     setCurrentIndex(0);
     setSelectedId(null);
+    setRoundStartedAt(null);
+    setTotalElapsedMs(0);
   };
 
   const toggleVoice = () => {
@@ -292,6 +325,17 @@ export default function App() {
 
     setVoiceEnabled(next);
   };
+
+  createEffect(() => {
+    const question = currentQuestion();
+
+    if (screen() !== 'playing' || !question || selectedId() !== null) {
+      setRoundStartedAt(null);
+      return;
+    }
+
+    setRoundStartedAt(Date.now());
+  });
 
   createEffect(() => {
     const question = currentQuestion();
@@ -337,6 +381,7 @@ export default function App() {
       }
 
       tts.stop();
+      captureRoundElapsed();
       setSelectedId('__timeout__');
       setResults((prev) => [
         ...prev,
@@ -630,6 +675,10 @@ export default function App() {
                 <div>
                   <span>正答率</span>
                   <strong>{scoreRate()}%</strong>
+                </div>
+                <div>
+                  <span>累計時間</span>
+                  <strong>{formattedElapsedTime()}</strong>
                 </div>
               </div>
 
