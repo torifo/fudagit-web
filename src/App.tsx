@@ -1,4 +1,13 @@
-import { For, Match, Show, Switch, createMemo, createSignal } from 'solid-js';
+import {
+  For,
+  Match,
+  Show,
+  Switch,
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+} from 'solid-js';
 import type { Card } from './data/cards';
 import { cards } from './data/cards';
 
@@ -118,7 +127,61 @@ const splitReadingText = (text: string) => {
   return tokens;
 };
 
+const createBrowserTts = () => {
+  const isSupported = () =>
+    typeof window !== 'undefined' && 'speechSynthesis' in window;
+
+  const stop = () => {
+    if (!isSupported()) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+  };
+
+  const pickVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+
+    return (
+      voices.find((voice) => voice.lang.startsWith('ja')) ??
+      voices.find((voice) => voice.default) ??
+      voices[0]
+    );
+  };
+
+  const speak = (text: string) => {
+    if (!isSupported()) {
+      return;
+    }
+
+    stop();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = pickVoice();
+
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    } else {
+      utterance.lang = 'ja-JP';
+    }
+
+    utterance.rate = 0.94;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  return {
+    isSupported,
+    speak,
+    stop,
+  };
+};
+
 export default function App() {
+  const tts = createBrowserTts();
   const [screen, setScreen] = createSignal<Screen>('start');
   const [difficulty, setDifficulty] = createSignal<Difficulty>('normal');
   const [questionCount, setQuestionCount] = createSignal<number>(10);
@@ -126,6 +189,7 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = createSignal(0);
   const [results, setResults] = createSignal<RoundResult[]>([]);
   const [selectedId, setSelectedId] = createSignal<string | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = createSignal(tts.isSupported());
 
   const currentQuestion = createMemo(() => questions()[currentIndex()]);
   const totalQuestions = createMemo(() => questions().length);
@@ -156,6 +220,7 @@ export default function App() {
   const startGame = () => {
     const nextQuestions = buildQuestions(difficulty(), questionCount());
 
+    tts.stop();
     setQuestions(nextQuestions);
     setResults([]);
     setCurrentIndex(0);
@@ -176,11 +241,14 @@ export default function App() {
 
     const correct = prompt.id === cardId;
 
+    tts.stop();
     setSelectedId(cardId);
     setResults((prev) => [...prev, { selectedId: cardId, correct }]);
   };
 
   const goNext = () => {
+    tts.stop();
+
     if (currentIndex() === totalQuestions() - 1) {
       setScreen('results');
       return;
@@ -191,12 +259,43 @@ export default function App() {
   };
 
   const resetToStart = () => {
+    tts.stop();
     setScreen('start');
     setQuestions([]);
     setResults([]);
     setCurrentIndex(0);
     setSelectedId(null);
   };
+
+  const toggleVoice = () => {
+    const next = !voiceEnabled();
+
+    if (!next) {
+      tts.stop();
+    }
+
+    setVoiceEnabled(next);
+  };
+
+  createEffect(() => {
+    const question = currentQuestion();
+
+    if (
+      screen() !== 'playing' ||
+      !question ||
+      selectedId() ||
+      !voiceEnabled()
+    ) {
+      tts.stop();
+      return;
+    }
+
+    tts.speak(question.prompt.description);
+  });
+
+  onCleanup(() => {
+    tts.stop();
+  });
 
   return (
     <main class="app-shell">
@@ -255,6 +354,26 @@ export default function App() {
                 </div>
               </div>
 
+              <div class="panel-block">
+                <h2>読み上げ</h2>
+                <button
+                  type="button"
+                  classList={{
+                    'toggle-button': true,
+                    enabled: voiceEnabled(),
+                  }}
+                  onClick={toggleVoice}
+                  disabled={!tts.isSupported()}
+                  aria-pressed={voiceEnabled()}
+                >
+                  {tts.isSupported()
+                    ? voiceEnabled()
+                      ? '音声 ON'
+                      : '音声 OFF'
+                    : 'このブラウザでは非対応'}
+                </button>
+              </div>
+
               <button type="button" class="primary-button" onClick={startGame}>
                 いざ開始
               </button>
@@ -286,6 +405,22 @@ export default function App() {
                   <div class="status-item">
                     <span class="status-label">難易度</span>
                     <strong>{difficultyConfig[difficulty()].label}</strong>
+                  </div>
+                  <div class="status-item status-item-audio">
+                    <span class="status-label">読み上げ</span>
+                    <button
+                      type="button"
+                      classList={{
+                        'toggle-button': true,
+                        'toggle-button-compact': true,
+                        enabled: voiceEnabled(),
+                      }}
+                      onClick={toggleVoice}
+                      disabled={!tts.isSupported()}
+                      aria-pressed={voiceEnabled()}
+                    >
+                      {voiceEnabled() ? 'ON' : 'OFF'}
+                    </button>
                   </div>
                 </header>
 
