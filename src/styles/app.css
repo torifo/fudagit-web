@@ -237,6 +237,14 @@ h2 {
   box-shadow: 0 14px 34px rgba(63, 111, 79, 0.14);
 }
 
+.chip.selected {
+  background: var(--accent);
+  color: #f8f6f0;
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: none;
+}
+
 .choice-title {
   font-size: 1.15rem;
   font-weight: 700;
